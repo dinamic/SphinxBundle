@@ -6,14 +6,17 @@ use Pagerfanta\Adapter\ArrayAdapter;
 use Pagerfanta\Pagerfanta;
 use Doctrine\ORM\EntityManager;
 
+use Highco\SphinxBundle\Pager\InterfaceSphinxPager;
+use Highco\SphinxBundle\Pager\AbstractSphinxPager;
+
 /**
  * WhiteOctoberDoctrineORMBridge
  *
- * @package
- * @version $id$
+ * @package HighcoSphinBundle
+ * @version 0.1
  * @author Stephane PY <py.stephane1(at)gmail.com>
  */
-class WhiteOctoberDoctrineORMBridge
+class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements InterfaceSphinxPager
 {
     protected $em;
     protected $repository_class;
@@ -81,7 +84,7 @@ class WhiteOctoberDoctrineORMBridge
             throw new \RuntimeException('You should define sphinx results on '.__CLASS__);
         }
 
-        $pks = $this->__extractPksFromResults();
+        $pks = $this->_extractPksFromResults();
 
         if(empty($pks))
         {
@@ -110,23 +113,5 @@ class WhiteOctoberDoctrineORMBridge
         }
 
         return new Pagerfanta(new ArrayAdapter($orderedResults));
-    }
-
-    /**
-     * __extractPksFromResults
-     *
-     * @return rray
-     */
-    private function __extractPksFromResults()
-    {
-        $matches = isset($this->results['matches']) ? $this->results['matches'] : array();
-
-        $pks     = array();
-        foreach($matches as $id => $match)
-        {
-            $pks[$id] = $id;
-        }
-
-        return $pks;
     }
 }
