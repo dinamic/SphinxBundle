@@ -2,7 +2,7 @@
 
 namespace Highco\SphinxBundle\Client;
 
-require "/Users/spy/Sites/busibook2/vendor/sphinx/sphinxapi.php";
+require __DIR__."/../../../../../vendor/sphinx/sphinxapi.php";
 
 /**
  * DefaultClient
