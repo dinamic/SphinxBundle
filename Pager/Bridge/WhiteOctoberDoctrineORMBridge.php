@@ -86,32 +86,32 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
 
         $pks = $this->_extractPksFromResults();
 
-        if(empty($pks))
+        $results = array();
+        if(false === empty($pks))
         {
-            return array();
-        }
+            $qb = $this->em
+                ->createQueryBuilder()
+                ->select('r')
+                ->from($this->repository_class, sprintf('r INDEX BY r.%s', $this->pk_column));
 
-        $qb = $this->em
-            ->createQueryBuilder()
-            ->select('r')
-            ->from($this->repository_class, sprintf('r INDEX BY r.%s', $this->pk_column));
+            $qb = $qb->where($qb->expr()->in('r.'.$this->pk_column, $pks))
+                //->addOrderBy('FIELD(r.id,...)', 'ASC')
+                ->getQuery()
+                ;
+            //@todo watching on doctrine FIELD extension ... we cannot use it natively . . . .
 
-        $qb = $qb->where($qb->expr()->in('r.'.$this->pk_column, $pks))
-            ->getQuery()
-            ;
-        //@todo watching on doctrine FIELD extension ... we cannot use it natively . . . .
+            $unordoredResults = $qb->getResult();
 
-        $results = $qb->getResult();
-
-        $orderedResults = array();
-        foreach($pks as $pk)
-        {
-            if(isset($results[$pk]))
+            foreach($pks as $pk)
             {
-                $orderedResults[$pk] = $results[$pk];
+                if(isset($unordoredResults[$pk]))
+                {
+                    $results[$pk] = $unordoredResults[$pk];
+                }
             }
         }
 
-        return new Pagerfanta(new ArrayAdapter($orderedResults));
+
+        return new Pagerfanta(new ArrayAdapter($results));
     }
 }
