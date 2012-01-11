@@ -2,7 +2,7 @@
 
 namespace Highco\SphinxBundle\Pager\Bridge;
 
-use Pagerfanta\Adapter\ArrayAdapter;
+use Highco\SphinxBundle\Pager\Bridge\PagerFantaAdapter\SphinxAdapter;
 use Pagerfanta\Pagerfanta;
 use Doctrine\ORM\EntityManager;
 
@@ -111,7 +111,9 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
             }
         }
 
+        $adapter = new SphinxAdapter($results);
+        $adapter->setNbResults(isset($this->results['total_found']) ? $this->results['total_found'] : 0);
 
-        return new Pagerfanta(new ArrayAdapter($results));
+        return new Pagerfanta($adapter);
     }
 }
