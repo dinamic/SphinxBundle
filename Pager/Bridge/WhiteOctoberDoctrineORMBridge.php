@@ -110,8 +110,10 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
                 }
             }
         }
-
-        $adapter = new SphinxAdapter($results);
+        
+        $adapter = $this->container->get('highco.sphinx.pager.white_october.doctrine_orm.adapter');
+        $adapter->setArray($results);
+        
         $adapter->setNbResults(isset($this->results['total_found']) ? $this->results['total_found'] : 0);
 
         return new Pagerfanta($adapter);
