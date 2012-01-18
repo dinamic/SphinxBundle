@@ -6,8 +6,8 @@ use Pagerfanta\Adapter\AdapterInterface;
 
 class SphinxAdapter implements AdapterInterface
 {
-    private $array;
-    private $nb_results = 0;
+    protected $array = array();
+    protected $nb_results = 0;
 
     /**
      * Constructor.
@@ -16,7 +16,7 @@ class SphinxAdapter implements AdapterInterface
      *
      * @api
      */
-    public function __construct(array $array)
+    public function __construct(array $array = null)
     {
         $this->array = $array;
     }
@@ -31,6 +31,11 @@ class SphinxAdapter implements AdapterInterface
     public function getArray()
     {
         return $this->array;
+    }
+    
+    public function setArray(array $array)
+    {
+        $this->array = $array;
     }
 
     /**
@@ -57,6 +62,10 @@ class SphinxAdapter implements AdapterInterface
      */
     public function getSlice($offset, $length)
     {
+        if ($offset >= count($this->array)) {
+            return $this->array;
+        }
+        
         return array_slice($this->array, $offset, $length);
     }
 
