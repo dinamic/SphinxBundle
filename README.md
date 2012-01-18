@@ -3,7 +3,7 @@ HighcoSphinxBundle
 
 This bundle use sphinx php api, you have to include on *dir*/vendor/sphinx/sphinxapi.php your version of sphinxapi which is on package found on http://sphinxsearch.com/downloads/
 
-# Exemple:
+# Example:
 
     $client = $this->get('highco.sphinx.client');
 
@@ -14,6 +14,22 @@ This bundle use sphinx php api, you have to include on *dir*/vendor/sphinx/sphin
 
     $pager = $bridge->getPager();
 
+# Paging example
+
+    $itemsPerPage = 50;
+    $page = 1;
+
+    $client = $this->get('highco.sphinx.client');
+    $client->SetLimits( ($page -1) * $itemsPerPage, $itemsPerPage);
+
+    $bridge = $this->get('highco.sphinx.pager.white_october.doctrine_orm');
+    $bridge->setRepositoryClass('HighcoUserBundle:User');
+    $bridge->setPkColumn('id');
+    $bridge->setSphinxResults($client->Query('Stéphane'));
+
+    $pager = $bridge->getPager();
+    $pager->setMaxPerPage($itemsPerPage);
+    $pager->setCurrentPage($page);
 
 # Todo
 
