@@ -22,6 +22,7 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
     protected $repository_class;
     protected $pk_column = "id";
     protected $results;
+    protected $query = null;
 
     /**
      * __construct
@@ -89,10 +90,7 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
         $results = array();
         if(false === empty($pks))
         {
-            $qb = $this->em
-                ->createQueryBuilder()
-                ->select('r')
-                ->from($this->repository_class, sprintf('r INDEX BY r.%s', $this->pk_column));
+            $qb = $this->getQuery();
 
             $qb = $qb->where($qb->expr()->in('r.'.$this->pk_column, $pks))
                 //->addOrderBy('FIELD(r.id,...)', 'ASC')
@@ -110,12 +108,52 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
                 }
             }
         }
-        
+
         $adapter = $this->container->get('highco.sphinx.pager.white_october.doctrine_orm.adapter');
         $adapter->setArray($results);
-        
+
         $adapter->setNbResults(isset($this->results['total_found']) ? $this->results['total_found'] : 0);
 
         return new Pagerfanta($adapter);
+    }
+
+    /**
+     * getDefaultQuery
+     *
+     * @return string query
+     */
+    public function getDefaultQuery()
+    {
+        return $this->em
+                ->createQueryBuilder()
+                ->select('r')
+                ->from($this->repository_class, sprintf('r INDEX BY r.%s', $this->pk_column));
+    }
+
+    /**
+     * setDefaultQuery
+     *
+     * @param query
+     * @return void
+     */
+    public function setQuery($query)
+    {
+        $this->query = $query;
+    }
+
+    /**
+     * setDefaultQuery
+     *
+     * @param query
+     * @return void
+     */
+    public function getQuery()
+    {
+        if ($this->query == null)
+        {
+            return $this->getDefaultQuery();
+        }else{
+            return $this->query;
+        }
     }
 }
