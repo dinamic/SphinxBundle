@@ -15,7 +15,7 @@
                 <argument type="service" id="service_container" />
             </call>
         </service>
-        
+
         <service id="highco.sphinx.pager.white_october.doctrine_orm.adapter" class="%highco.sphinx.pager.white_october.doctrine_orm.adapter.class%" scope="prototype">
         </service>
     </services>
