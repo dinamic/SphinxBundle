@@ -11,12 +11,11 @@
 
     <services>
         <service id="highco.sphinx.pager.white_october.doctrine_orm" class="%highco.sphinx.pager.white_october.doctrine_orm.class%" scope="prototype">
-            <argument type="service" id="doctrine.orm.entity_manager" />
             <call method="setContainer">
                 <argument type="service" id="service_container" />
             </call>
         </service>
-        
+
         <service id="highco.sphinx.pager.white_october.doctrine_orm.adapter" class="%highco.sphinx.pager.white_october.doctrine_orm.adapter.class%" scope="prototype">
         </service>
     </services>

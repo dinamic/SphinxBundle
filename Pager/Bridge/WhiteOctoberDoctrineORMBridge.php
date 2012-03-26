@@ -18,22 +18,11 @@ use Highco\SphinxBundle\Pager\AbstractSphinxPager;
  */
 class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements InterfaceSphinxPager
 {
-    protected $em;
     protected $repository_class;
+    protected $entityManagerName = "default";
     protected $pk_column = "id";
     protected $results;
     protected $query = null;
-
-    /**
-     * __construct
-     *
-     * @param mixed $em
-     * @return void
-     */
-    public function __construct(EntityManager $em)
-    {
-        $this->em = $em;
-    }
 
     /**
      * setRepositoryClass
@@ -75,21 +64,18 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
      */
     public function getPager()
     {
-        if(is_null($this->repository_class))
-        {
+        if (is_null($this->repository_class)) {
             throw new \RuntimeException('You should define a repository class on '.__CLASS__);
         }
 
-        if(is_null($this->results))
-        {
+        if (is_null($this->results)) {
             throw new \RuntimeException('You should define sphinx results on '.__CLASS__);
         }
 
         $pks = $this->_extractPksFromResults();
 
         $results = array();
-        if(false === empty($pks))
-        {
+        if (false === empty($pks)) {
             $qb = $this->getQuery();
 
             $qb = $qb->where($qb->expr()->in('r.'.$this->pk_column, $pks))
@@ -100,10 +86,8 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
 
             $unordoredResults = $qb->getResult();
 
-            foreach($pks as $pk)
-            {
-                if(isset($unordoredResults[$pk]))
-                {
+            foreach ($pks as $pk) {
+                if (isset($unordoredResults[$pk])) {
                     $results[$pk] = $unordoredResults[$pk];
                 }
             }
@@ -124,10 +108,21 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
      */
     public function getDefaultQuery()
     {
-        return $this->em
+        $em = $this->container->get('doctrine')
+            ->getEntityManager($this->entityManagerName);
+
+        return $em
                 ->createQueryBuilder()
                 ->select('r')
                 ->from($this->repository_class, sprintf('r INDEX BY r.%s', $this->pk_column));
+    }
+
+    /**
+     * @param string $entityManagerName
+     */
+    public function setEntityManagerName($entityManagerName)
+    {
+        $this->entityManagerName = $entityManagerName;
     }
 
     /**
@@ -149,10 +144,9 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
      */
     public function getQuery()
     {
-        if ($this->query == null)
-        {
+        if ($this->query == null) {
             return $this->getDefaultQuery();
-        }else{
+        } else {
             return $this->query;
         }
     }
