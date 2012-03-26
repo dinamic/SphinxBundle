@@ -12,8 +12,6 @@ use Highco\SphinxBundle\Pager\AbstractSphinxPager;
 /**
  * WhiteOctoberDoctrineORMBridge
  *
- * @package HighcoSphinBundle
- * @version 0.1
  * @author Stephane PY <py.stephane1(at)gmail.com>
  */
 class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements InterfaceSphinxPager
@@ -25,10 +23,7 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
     protected $query = null;
 
     /**
-     * setRepositoryClass
-     *
-     * @param mixed $repositoryClass
-     * @return void
+     * @param string $repositoryClass
      */
     public function setRepositoryClass($repositoryClass)
     {
@@ -36,10 +31,7 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
     }
 
     /**
-     * setPkColumn
-     *
-     * @param mixed $pkColumn
-     * @return void
+     * @param string $pkColumn
      */
     public function setPkColumn($pkColumn)
     {
@@ -47,10 +39,7 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
     }
 
     /**
-     * setSphinxResults
-     *
-     * @param mixed $results
-     * @return void
+     * @param array $results
      */
     public function setSphinxResults($results)
     {
@@ -58,9 +47,7 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
     }
 
     /**
-     * getPager
-     *
-     * @return void
+     * @return PagerFanta
      */
     public function getPager()
     {
@@ -102,9 +89,7 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
     }
 
     /**
-     * getDefaultQuery
-     *
-     * @return string query
+     * @return QueryBuilder query
      */
     public function getDefaultQuery()
     {
@@ -126,10 +111,7 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
     }
 
     /**
-     * setDefaultQuery
-     *
-     * @param query
-     * @return void
+     * @param QueryBuilder $query
      */
     public function setQuery($query)
     {
@@ -137,10 +119,7 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
     }
 
     /**
-     * setDefaultQuery
-     *
-     * @param query
-     * @return void
+     * @return aQueryBuilder
      */
     public function getQuery()
     {
