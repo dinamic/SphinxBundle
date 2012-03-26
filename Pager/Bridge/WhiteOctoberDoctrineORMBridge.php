@@ -12,14 +12,35 @@ use Highco\SphinxBundle\Pager\AbstractSphinxPager;
 /**
  * WhiteOctoberDoctrineORMBridge
  *
+ * @uses AbstractSphinxPager
+ * @uses InterfaceSphinxPager
  * @author Stephane PY <py.stephane1(at)gmail.com>
  */
 class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements InterfaceSphinxPager
 {
+    /**
+     * @var string
+     */
     protected $repository_class;
+
+    /**
+     * @var string
+     */
     protected $entityManagerName = "default";
+
+    /**
+     * @var string
+     */
     protected $pk_column = "id";
+
+    /**
+     * @var array
+     */
     protected $results;
+
+    /**
+     * @var QueryBuilder
+     */
     protected $query = null;
 
     /**

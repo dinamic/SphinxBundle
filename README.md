@@ -8,6 +8,7 @@ This bundle use sphinx php api, you have to include on *dir*/vendor/sphinx/sphin
     $client = $this->get('highco.sphinx.client');
 
     $bridge = $this->get('highco.sphinx.pager.white_october.doctrine_orm');
+    $bridget->setEntityManagerName('my_customer_em'); // default is null
     $bridge->setRepositoryClass('HighcoUserBundle:User');
     $bridge->setPkColumn('id');
     $bridge->setSphinxResults($client->Query('Stéphane'));
