@@ -5,6 +5,7 @@ namespace Highco\SphinxBundle\Pager\Bridge;
 use Highco\SphinxBundle\Pager\Bridge\PagerFantaAdapter\SphinxAdapter;
 use Pagerfanta\Pagerfanta;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
 
 use Highco\SphinxBundle\Pager\InterfaceSphinxPager;
 use Highco\SphinxBundle\Pager\AbstractSphinxPager;
@@ -15,84 +16,151 @@ use Highco\SphinxBundle\Pager\AbstractSphinxPager;
  * @package HighcoSphinBundle
  * @version 0.1
  * @author Stephane PY <py.stephane1(at)gmail.com>
+ * @author Nikola Petkanski <nikola@petkanski.com>
  */
 class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements InterfaceSphinxPager
-{
-    protected $em;
-    protected $repository_class;
-    protected $pk_column = "id";
-    protected $results;
-
+{   
     /**
-     * __construct
-     *
-     * @param mixed $em
-     * @return void
+     * @var EntityManager|null
      */
-    public function __construct(EntityManager $em)
+    protected $em;
+    
+    /**
+     * @var string
+     */
+    protected $repository_class;
+    
+    /**
+     * @var string
+     */
+    protected $pk_column = "id";
+    
+    /**
+     * The results obtained from sphinx
+     * 
+     * @var array
+     */
+    protected $results;
+    
+    /**
+     * @var string
+     */
+    protected $query = null;
+    
+    /**
+     *
+     * @return EntityManager 
+     */
+    protected function getEntityManager()
     {
+        if ($this->em === null) {
+            $this->em = $this->container->get('doctrine')->getEntityManager();
+        }
+        
+        return $this->em;
+    }
+    
+    /**
+     * Sets the name of the entity manager which should be used to transform Sphinx results to entities.
+     * 
+     * @param string $name
+     * 
+     * @return WhiteOctoberDoctrineORMBridge
+     * 
+     * @throws \LogicException
+     */
+    public function setEntityManagerByName($name)
+    {
+        if ($this->em !== null) {
+            throw new \LogicException('Entity manager can only be set before any results are fetched');
+        }
+        
+        $this->em = $this->container->get('doctrine')->getEntityManager($name);
+        
+        return $this;
+    }
+    
+    /**
+     * Sets the exact instance of entity manager which should be used to transform Sphinx results to entities.
+     * 
+     * @param EntityManager $name
+     * 
+     * @return WhiteOctoberDoctrineORMBridge 
+     */
+    public function setEntityManager(EntityManager $em)
+    {
+        if ($this->em !== null) {
+            throw new \LogicException('Entity manager can only be set before any results are fetched');
+        }
+        
         $this->em = $em;
+        
+        return $this;
     }
 
     /**
      * setRepositoryClass
      *
      * @param mixed $repositoryClass
-     * @return void
+     * 
+     * @return WhiteOctoberDoctrineORMBridge
      */
     public function setRepositoryClass($repositoryClass)
     {
         $this->repository_class = $repositoryClass;
+        
+        return $this;
     }
 
     /**
      * setPkColumn
      *
      * @param mixed $pkColumn
-     * @return void
+     * 
+     * @return WhiteOctoberDoctrineORMBridge
      */
     public function setPkColumn($pkColumn)
     {
         $this->pk_column = $pkColumn;
+        
+        return $this;
     }
 
     /**
      * setSphinxResults
      *
      * @param mixed $results
-     * @return void
+     * 
+     * @return WhiteOctoberDoctrineORMBridge
      */
     public function setSphinxResults($results)
     {
         $this->results = $results;
+        
+        return $this;
     }
 
     /**
-     * getPager
+     * Returns an instance of the pager
      *
-     * @return void
+     * @return Pagerfanta
      */
     public function getPager()
     {
-        if(is_null($this->repository_class))
-        {
+        if(is_null($this->repository_class)) {
             throw new \RuntimeException('You should define a repository class on '.__CLASS__);
         }
 
-        if(is_null($this->results))
-        {
+        if(is_null($this->results)) {
             throw new \RuntimeException('You should define sphinx results on '.__CLASS__);
         }
 
         $pks = $this->_extractPksFromResults();
 
         $results = array();
-        if(false === empty($pks))
-        {
-            $qb = $this->em
-                ->createQueryBuilder()
-                ->select('r')
-                ->from($this->repository_class, sprintf('r INDEX BY r.%s', $this->pk_column));
+        
+        if(false === empty($pks)) {
+            $qb = $this->getQuery();
 
             $qb = $qb->where($qb->expr()->in('r.'.$this->pk_column, $pks))
                 //->addOrderBy('FIELD(r.id,...)', 'ASC')
@@ -102,20 +170,58 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
 
             $unordoredResults = $qb->getResult();
 
-            foreach($pks as $pk)
-            {
-                if(isset($unordoredResults[$pk]))
-                {
+            foreach($pks as $pk) {
+                if(isset($unordoredResults[$pk])) {
                     $results[$pk] = $unordoredResults[$pk];
                 }
             }
         }
-        
+
         $adapter = $this->container->get('highco.sphinx.pager.white_october.doctrine_orm.adapter');
         $adapter->setArray($results);
-        
+
         $adapter->setNbResults(isset($this->results['total_found']) ? $this->results['total_found'] : 0);
 
         return new Pagerfanta($adapter);
+    }
+
+    /**
+     * 
+     * @return QueryBuilder
+     */
+    public function getDefaultQuery()
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        /* @var $qb \Doctrine\DBAL\Query\QueryBuilder */
+        
+        return $qb->select('r') ->from($this->repository_class, sprintf('r INDEX BY r.%s', $this->pk_column));
+    }
+
+    /**
+     * Replaces the query builder
+     * 
+     * @param QueryBuilder $query
+     * 
+     * @return WhiteOctoberDoctrineORMBridge
+     */
+    public function setQuery($query)
+    {
+        $this->query = $query;
+        
+        return $this;
+    }
+
+    /**
+     * setDefaultQuery
+     *
+     * @return QueryBuilder
+     */
+    public function getQuery()
+    {
+        if ($this->query == null) {
+            return $this->getDefaultQuery();
+        }
+        
+        return $this->query;
     }
 }
