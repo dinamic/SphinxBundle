@@ -41,6 +41,11 @@ This bundle use sphinx php api, you have to include on *dir*/vendor/sphinx/sphin
 
     $bridge = $this->get('highco.sphinx.pager.white_october.doctrine_orm');
     
+    /**
+     * Make sure you have this column defined as attribute in Sphinx (i.e: sql_attr_string = type).
+     * Sphinx prior version 1.10 does not have support for sql_attr_string, but you can use sql_attr_uint 
+     * and have your discriminators defined as constants in PHP.
+     */
     $bridge->setDiscriminatorColumn('type');
     
     $bridge->setDiscriminatorRepositories(array(
