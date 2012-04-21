@@ -3,7 +3,7 @@ HighcoSphinxBundle
 
 This bundle use sphinx php api, you have to include on *dir*/vendor/sphinx/sphinxapi.php your version of sphinxapi which is on package found on http://sphinxsearch.com/downloads/
 
-# Example:
+# Simple example:
 
     $client = $this->get('highco.sphinx.client');
 
@@ -24,6 +24,40 @@ This bundle use sphinx php api, you have to include on *dir*/vendor/sphinx/sphin
 
     $bridge = $this->get('highco.sphinx.pager.white_october.doctrine_orm');
     $bridge->setRepositoryClass('HighcoUserBundle:User');
+    $bridge->setPkColumn('id');
+    $bridge->setSphinxResults($client->Query('Stéphane'));
+
+    $pager = $bridge->getPager();
+    $pager->setMaxPerPage($itemsPerPage);
+    $pager->setCurrentPage($page);
+    
+# Paging example /w discriminator attribute
+
+    $itemsPerPage = 50;
+    $page = 1;
+
+    $client = $this->get('highco.sphinx.client');
+    $client->SetLimits( ($page -1) * $itemsPerPage, $itemsPerPage);
+
+    $bridge = $this->get('highco.sphinx.pager.white_october.doctrine_orm');
+    
+    $bridge->setDiscriminatorColumn('type');
+    
+    $bridge->setDiscriminatorRepositories(array(
+        'article'       => array(
+            'class' => 'BlogBundle:Article',
+            'em'    => 'default',
+        ),
+        'category'      => array(
+            'class' => 'BlogBundle:Category',
+            'em'    => 'default',
+        ),
+        'note'         => array(
+            'class' => 'NotesBundle:Message',
+            'em'    => 'notes'
+        ),
+    ));
+    
     $bridge->setPkColumn('id');
     $bridge->setSphinxResults($client->Query('Stéphane'));
 
