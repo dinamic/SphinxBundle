@@ -81,6 +81,7 @@ $pager->setCurrentPage($page);
 
 # Todo
 
+- Watch for coding conventions, I....should be ....Interface, line should be wrapped, etc...
 - Let user can modify client options on config.yml
 - Create default pager
 
