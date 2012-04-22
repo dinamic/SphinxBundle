@@ -4,10 +4,23 @@ namespace Highco\SphinxBundle\Pager\Bridge\PagerFantaAdapter;
 
 use Pagerfanta\Adapter\AdapterInterface;
 
+/**
+ * SphinxAdapter
+ *
+ * @uses AdapterInterface
+ * @author Stephane PY <py.stephane1@gmail.com>
+ */
 class SphinxAdapter implements AdapterInterface
 {
+    /**
+     * @var array
+     */
     protected $array = array();
-    protected $nb_results = 0;
+
+    /**
+     * @var integer
+     */
+    protected $nbResults = 0;
 
     /**
      * Constructor.
@@ -32,7 +45,12 @@ class SphinxAdapter implements AdapterInterface
     {
         return $this->array;
     }
-    
+
+    /**
+     * @param array $array
+     *
+     * @return void
+     */
     public function setArray(array $array)
     {
         $this->array = $array;
@@ -43,18 +61,18 @@ class SphinxAdapter implements AdapterInterface
      */
     public function getNbResults()
     {
-        return $this->nb_results;
+        return $this->nbResults;
     }
 
     /**
      * setNbResults
      *
-     * @param mixed $v
+     * @param integer $v nbOfResults
      * @return void
      */
     public function setNbResults($v)
     {
-        $this->nb_results = $v;
+        $this->nbResults = $v;
     }
 
     /**
@@ -65,7 +83,7 @@ class SphinxAdapter implements AdapterInterface
         if ($offset >= count($this->array)) {
             return $this->array;
         }
-        
+
         return array_slice($this->array, $offset, $length);
     }
 

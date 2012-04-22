@@ -15,7 +15,7 @@ use Highco\SphinxBundle\Pager\AbstractSphinxPager;
  *
  * @uses AbstractSphinxPager
  * @uses InterfaceSphinxPager
- * @author Stephane PY <py.stephane1(at)gmail.com>
+ * @author Stephane PY <py.stephane1@gmail.com>
  * @author Nikola Petkanski <nikola@petkanski.com>
  */
 class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements InterfaceSphinxPager
@@ -28,12 +28,12 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
     /**
      * @var string
      */
-    protected $repository_class;
+    protected $repositoryClass;
 
     /**
      * @var string
      */
-    protected $pk_column = "id";
+    protected $pkColumn = "id";
 
     /**
      * @var QueryBuilder
@@ -113,7 +113,7 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
      */
     public function setRepositoryClass($repositoryClass)
     {
-        $this->repository_class = $repositoryClass;
+        $this->repositoryClass = $repositoryClass;
 
         return $this;
     }
@@ -127,7 +127,7 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
      */
     public function setPkColumn($pkColumn)
     {
-        $this->pk_column = $pkColumn;
+        $this->pkColumn = $pkColumn;
 
         return $this;
     }
@@ -199,7 +199,7 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
     public function getPager()
     {
         $hasDiscriminator = $this->discriminatorColumn !== null;
-        $hasRepositoryClass = $this->repository_class !== null;
+        $hasRepositoryClass = $this->repositoryClass !== null;
 
         if (!$hasRepositoryClass && !$hasDiscriminator) {
             throw new \RuntimeException('You should define either a repository class, either discriminator');
@@ -264,7 +264,7 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
 
             $primaryKeys = array_keys($discriminatorResults);
 
-            $query = $qb->where($qb->expr()->in('r.'.$this->pk_column, $primaryKeys))->getQuery();
+            $query = $qb->where($qb->expr()->in('r.'.$this->pkColumn, $primaryKeys))->getQuery();
             /* @var $query \Doctrine\ORM\Query */
 
             foreach ($query->execute() as $id => $entity) {
@@ -275,6 +275,9 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
         return $results;
     }
 
+    /**
+     * @return array
+     */
     protected function getResults()
     {
         $pks = $this->_extractPksFromResults();
@@ -284,10 +287,9 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
         if (false === empty($pks)) {
             $qb = $this->getQuery();
 
-            $qb = $qb->where($qb->expr()->in('r.'.$this->pk_column, $pks))
+            $qb = $qb->where($qb->expr()->in('r.'.$this->pkColumn, $pks))
                 //->addOrderBy('FIELD(r.id,...)', 'ASC')
-                ->getQuery()
-                ;
+                ->getQuery();
             //@todo watching on doctrine FIELD extension ... we cannot use it natively . . . .
 
             $unordoredResults = $qb->getResult();
@@ -314,7 +316,7 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
 
         $repositoryClass = $discriminatorData['class'];
 
-        return $qb->select('r') ->from($repositoryClass, sprintf('r INDEX BY r.%s', $this->pk_column));
+        return $qb->select('r') ->from($repositoryClass, sprintf('r INDEX BY r.%s', $this->pkColumn));
     }
 
     /**
@@ -325,7 +327,7 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
         $qb = $this->getEntityManager()->createQueryBuilder();
         /* @var $qb \Doctrine\DBAL\Query\QueryBuilder */
 
-        return $qb->select('r') ->from($this->repository_class, sprintf('r INDEX BY r.%s', $this->pk_column));
+        return $qb->select('r') ->from($this->repositoryClass, sprintf('r INDEX BY r.%s', $this->pkColumn));
 
     }
 

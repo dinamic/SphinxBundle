@@ -9,7 +9,7 @@ use Symfony\Component\DependencyInjection\ContainerAware;
  *
  * @package HighcoSphinBundle
  * @version 0.1
- * @author Stephane PY <py.stephane1(at)gmail.com>
+ * @author Stephane PY <py.stephane1@gmail.com>
  */
 abstract class AbstractSphinxPager extends ContainerAware
 {
@@ -23,8 +23,7 @@ abstract class AbstractSphinxPager extends ContainerAware
         $matches = isset($this->results['matches']) ? $this->results['matches'] : array();
 
         $pks     = array();
-        foreach($matches as $id => $match)
-        {
+        foreach ($matches as $id => $match) {
             $pks[$id] = $id;
         }
 
