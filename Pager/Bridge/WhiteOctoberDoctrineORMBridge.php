@@ -239,7 +239,9 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
         /**
          * Collect discriminators and their records
          */
-        foreach ($rawResults['matches'] as $id => $row) {
+        foreach ($rawResults['matches'] as $row) {
+            $id = $row['id'];
+            
             if (!key_exists($this->discriminatorColumn, $row['attrs'])) {
                 throw new \UnexpectedValueException('Missing discriminator column in sphinx result entry');
             }
