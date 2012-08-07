@@ -38,6 +38,7 @@ $bridge->setSphinxResults($client->Query('Stéphane'));
 $pager = $bridge->getPager();
 $pager->setMaxPerPage($itemsPerPage);
 $pager->setCurrentPage($page);
+`````
 
 # Paging example with multiple queries
 
@@ -60,6 +61,7 @@ $bridge->setSphinxResults($client->RunQueries(), true);
 $pager = $bridge->getPager();
 $pager->setMaxPerPage($itemsPerPage);
 $pager->setCurrentPage($page);
+`````
 
 # Paging example /w discriminator attribute
 
