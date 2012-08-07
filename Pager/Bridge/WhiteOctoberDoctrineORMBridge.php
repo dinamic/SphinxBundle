@@ -180,13 +180,31 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
     /**
      * setSphinxResults
      *
-     * @param mixed $results
+     * @param mixed   $results
+     * @param boolean $consolidate
      *
      * @return WhiteOctoberDoctrineORMBridge
      */
-    public function setSphinxResults($results)
+    public function setSphinxResults($results, $consolidate = false)
     {
-        $this->results = $results;
+        if (!$consolidate) {
+            $this->results = $results;
+        } else {
+            $this->results = array(
+                'matches'       => array(),
+                'total'         => 0,
+                'total_found'   => 0,
+            );
+            
+            foreach($results as $result) {
+                $this->results['total'] += $result['total'];
+                $this->results['total_found'] += $result['total_found'];
+                
+                if ($result['total_found'] > 0) {
+                    $this->results['matches'] = array_merge($this->results['matches'], $result['matches']);
+                }
+            }
+        }
 
         return $this;
     }
@@ -212,7 +230,7 @@ class WhiteOctoberDoctrineORMBridge extends AbstractSphinxPager implements Inter
         $adapter = $this->container->get('highco.sphinx.pager.white_october.doctrine_orm.adapter');
 
         $results = $hasDiscriminator ? $this->getDiscriminatorResults() : $this->getResults();
-
+        
         $adapter->setArray($results);
 
         $adapter->setNbResults(isset($this->results['total_found']) ? $this->results['total_found'] : 0);
